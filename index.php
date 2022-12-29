@@ -31,7 +31,7 @@
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
           </div>
           <div class="modal-body">
-            <form id="login-usuario-form">
+            <form name="form_login" method="POST">
             <span id="msgAlertErroLogin"></span>
               <div class="mb-3">
                 <label for="email" class="col-form-label">Usuario:</label>
