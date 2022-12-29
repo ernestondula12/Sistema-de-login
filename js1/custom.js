@@ -1,37 +1,41 @@
-const loginForm = document.getElementById("login-usuario-form");
-const msgAlertErroLogin = document.getElementById("msgAlertErroLogin");
-const loginModal = new bootstrap.Modal(document.getElementById("loginModal"));
+$(function () {
 
-loginForm.addEventListener("submit", async (e) => {
+	$('form[name="from_login"]').submit(function (event) {
+		event.preventDefault();
 
-	e.preventDefault();
+		document.getElementById('login-usuario-btn').innerHTML = `<div class="spinner-grow" role="status"><span class="sr-only">Loading...</span></div>`;
+		document.getElementById('login-usuario-btn').disabled = true;
 
-	if (document.getElementById("email").value === "") {
-		msgAlertErroLogin.innerHTML = "<div class='alert alert-danger' role='alert'>Erro: Necessario preencher o campo usuário!</div>";
-
-	}else if (document.getElementById("senha").value === "") {
-
-		msgAlertErroLogin.innerHTML = "<div class='alert alert-danger' role='alert'>Erro: Necessario preencher o campo senha!</div>";
-	}else {
-
-		const dadosForm = new FormData(loginForm);
-
-		const dados = await fetch("validar.php", {
-
-			method: "POST",
-			body: dadosForm
-		});
-
-		const resposta = await dados.json(); 
-
-		if(resposta['erro']){
-
-			msgAlertErroLogin.innerHTML = resposta['msg']
-		}else{
-			
-			document.getElementById("dados-usuario").innerHTML = "Bem Vindo " + resposta['dados'].nome + "<br>";
-			loginForm.reset();
-			loginModal.hide();
+		var email = $(this).find('input#email').val();
+		
+		if (email == '') {
+			tata.warn(`Campos Incorretos`, 'Informe um email valido');
+			return
 		}
-	}
-});
+
+
+		$.ajax({
+			url: '/validar.php',
+			type: 'post',
+			data: $(this).serialize(),
+			dataType: 'json',
+			timeout: 40000,
+
+		}).done(function (msg) {
+			if (msg.mensagem.trim() == 'OK') {
+				window.location.href = '/home.php'
+			} else {
+				tata.warn(`${msg.mensagem}`, 'Sistema de Login');
+				document.getElementById('login-usuario-btn').disabled = false;
+				document.getElementById('login-usuario-btn').innerHTML = `Entrar`;
+			}
+		}).fail(function (data) {
+			tata.warn(`server internal`, 'Sistema de Login');
+
+			console.log(data.responseText)
+
+			document.getElementById('login-usuario-btn').disabled = false;
+			document.getElementById('login-usuario-btn').innerHTML = `Entrar`;
+		});
+	})
+})
